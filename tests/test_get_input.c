@@ -2,9 +2,11 @@
 #include "myutils.h"
 #include <munit.h>
 
+#define TEST_FOLDER "get_input/"
+
 static MunitResult test_simple(const MunitParameter params[], void* user_data_or_fixture)
 {
-    FILE *test_file = fopen(TEST_FILE_PATH "/get_input/test1.txt", "r");
+    FILE *test_file = fopen(TEST_FOLDER "/test1.txt", "r");
 
     char *input = fget_input(test_file);
     munit_assert_string_equal(input, "abcdef");
@@ -24,7 +26,7 @@ static MunitResult test_long(const MunitParameter params[], void* user_data_or_f
     expected_out[LEN - 2] = 'z';
     expected_out[LEN - 1] = '\0';
 
-    FILE *test_file = fopen(TEST_FILE_PATH "/get_input/test2.txt", "r");
+    FILE *test_file = fopen(TEST_FOLDER "test2.txt", "r");
 
     munit_assert_string_equal(fget_input(test_file), expected_out);
 
