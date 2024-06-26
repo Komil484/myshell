@@ -6,8 +6,6 @@ project(myshell_tests VERSION 1.0)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CTEST_OUTPUT_ON_FAILURE ON)
-
 # project vars
 set(SOURCES ../source/myutils.c ../source/myutils.h)
 
