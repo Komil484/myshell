@@ -20,7 +20,7 @@ static MunitResult test_simple(const MunitParameter params[], void* user_data_or
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);
-    free(parsed);
+    free_parsed(parsed);
 
     return MUNIT_OK;
 }
@@ -33,7 +33,7 @@ static MunitResult test_quotes(const MunitParameter params[], void* user_data_or
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);
-    free(parsed);
+    free_parsed(parsed);
 
     return MUNIT_OK;
 }
@@ -46,7 +46,7 @@ static MunitResult test_escape_chars(const MunitParameter params[], void* user_d
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);
-    free(parsed);
+    free_parsed(parsed);
 
     return MUNIT_OK;
 }
@@ -59,11 +59,10 @@ static MunitResult test_consec_quotes(const MunitParameter params[], void* user_
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);
-    free(parsed);
+    free_parsed(parsed);
 
     return MUNIT_OK;
 }
-
 
 static MunitResult test_weird_escapes(const MunitParameter params[], void* user_data_or_fixture)
 {
@@ -73,7 +72,33 @@ static MunitResult test_weird_escapes(const MunitParameter params[], void* user_
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);
-    free(parsed);
+    free_parsed(parsed);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_backticks(const MunitParameter params[], void* user_data_or_fixture)
+{
+    char input[] = "cmd `backticks`";
+
+    char *expected[] = {"cmd", "backticks", NULL};
+
+    char **parsed = parse(input);
+    assert_arr_string(parsed, expected);
+    free_parsed(parsed);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_backticks_escape(const MunitParameter params[], void* user_data_or_fixture)
+{
+    char input[] = "cmd `\\\\backticks\\`escape`\\n";
+
+    char *expected[] = {"cmd", "\\\\backticks`escape\\n", NULL};
+
+    char **parsed = parse(input);
+    assert_arr_string(parsed, expected);
+    free_parsed(parsed);
 
     return MUNIT_OK;
 }
@@ -114,6 +139,22 @@ static MunitTest tests[] = {
     {
         "/weird_escapes", /* name */
         test_weird_escapes, /* test */
+        NULL, /* setup */
+        NULL, /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL /* parameters */
+    },
+    {
+        "/backticks", /* name */
+        test_backticks, /* test */
+        NULL, /* setup */
+        NULL, /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL /* parameters */
+    },
+    {
+        "/backticks_escape", /* name */
+        test_backticks_escape, /* test */
         NULL, /* setup */
         NULL, /* tear_down */
         MUNIT_TEST_OPTION_NONE, /* options */

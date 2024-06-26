@@ -5,14 +5,19 @@
 #include <stdbool.h>
 
 // helper function declarations
-void realloc_if_full(char **args, unsigned long len, unsigned long *cap);
+void realloc_if_full(char **args, unsigned long arr_len, unsigned long *cap);
 void replace_if_escape(char **write, char **read);
 
-
 // returns null terminated array of c-strings
-char** parse(char *str)
+// creates copy of str, does not modify str
+// free resulting array of strings using "free_parsed()"
+char** parse(const char *in_str)
 {
-    unsigned long len = 2, cap = 16;
+    unsigned long str_len = strlen(in_str);
+    char *str = malloc(str_len + 1);
+    strncpy(str, in_str, str_len + 1);
+
+    unsigned long arr_len = 2, cap = 16;
     char **args = calloc(16, sizeof(char*));
     args[0] = str;
     char c;
@@ -27,10 +32,10 @@ char** parse(char *str)
                 ++read;
                 if (prev_char_space) break;
 
-                realloc_if_full(args, len, &cap);
+                realloc_if_full(args, arr_len, &cap);
                 *write++ = '\0';
-                args[len - 1] = write; // write -> resulting str
-                ++len;
+                args[arr_len - 1] = write; // write -> resulting str
+                ++arr_len;
                 break;
 
             case '\"':
@@ -54,6 +59,22 @@ char** parse(char *str)
                     c = *read;
                 }
                 if (c == '\'') {
+                    ++read;
+                }
+                break;
+
+            case '`':
+                ++read;
+                c = *read;
+                while(c != '`' && c != '\0') {
+                    if (c == '\\' && *(read + 1) == '`') {
+                        ++read;
+                    }
+                    *write++ = *read;
+                    ++read;
+                    c = *read;
+                }
+                if (c == '`') {
                     ++read;
                 }
                 break;
@@ -97,6 +118,9 @@ void replace_if_escape(char **write, char **read)
             case '\'':
                 *write_ptr = '\'';
                 break;
+            case '`':
+                *write_ptr = '`';
+                break;
             default:
                 *write_ptr = *read_ptr;
                 ++write_ptr;
@@ -115,25 +139,32 @@ void replace_if_escape(char **write, char **read)
 }
 
 
-void realloc_if_full(char **args, unsigned long len, unsigned long *cap)
+void realloc_if_full(char **args, unsigned long arr_len, unsigned long *cap)
 {
     unsigned long local_cap = *cap;
-    if (len < local_cap) return;
+    if (arr_len < local_cap) return;
 
     args = realloc(args, sizeof(char*) * local_cap * 2);
     local_cap *= 2;
-    for (unsigned long i = len; i < local_cap; ++i) {
+    for (unsigned long i = arr_len; i < local_cap; ++i) {
         args[i] = NULL;
     }
 
     *cap = local_cap;
 }
 
+// frees string array returned by "parse()"
+void free_parsed(char **parsed)
+{
+    free(parsed[0]);
+    free(parsed);
+}
 
-// returns str and len, str must be freed by the caller
-// str points to NULL if and only if realloc error occurs
-
+// buffer size of "buf" in "fget_input()"
 #define BUFFER_SIZE 4096
+
+// returns c-string, must be freed by the caller
+// c-string points to NULL if and only if realloc error occurs
 
 char* fget_input(FILE *fd)
 {
