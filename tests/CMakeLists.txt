@@ -15,6 +15,8 @@ set(MUNIT munit/munit.c munit/munit.h)
 set(TESTS
     test_get_input.c
     test_get_input.h
+    test_substitute_env_vars.c
+    test_substitute_env_vars.h
     test_parse.c
     test_parse.h
 )

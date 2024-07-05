@@ -94,7 +94,7 @@ static MunitResult test_backticks_escape(const MunitParameter params[], void* us
 {
     char input[] = "cmd `\\\\backticks\\`escape`\\n";
 
-    char *expected[] = {"cmd", "\\\\backticks`escape\\n", NULL};
+    char *expected[] = {"cmd", "\\backticks`escape\\n", NULL};
 
     char **parsed = parse(input);
     assert_arr_string(parsed, expected);

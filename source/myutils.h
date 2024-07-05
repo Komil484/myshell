@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+char *substitute_env_vars(const char *in_str);
 char **parse(const char *str);
 char *fget_input(FILE *fd);
 char *get_input();
