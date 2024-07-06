@@ -29,6 +29,27 @@ void run_process(char **args)
     }
 }
 
+void handle_env_var_operations(unsigned long arg_c, char **args) {
+    switch (arg_c) {
+        case 1:
+            fprintf(stderr, "var <variable> [value] [no-overwrite]\n");
+            fprintf(stderr, "if [value] is not provided, variable will be removed\n");
+            fprintf(stderr, "if [no-overwrite] is not provided, it will overwrite\n");
+            fprintf(stderr, "if [no-overwrite] is set to anything, it won't overwrite\n");
+            break;
+        case 2:
+            if (unsetenv(args[1])) perror("mysh");
+            break;
+        case 3:
+            if (setenv(args[1], args[2], 1)) perror("mysh");
+            break;
+        case 4:
+            if (getenv(args[1])) fprintf(stderr, "variable %s already exists\n", args[1]);
+            if (setenv(args[1], args[2], 0)) perror("mysh");
+            break;
+    }
+}
+
 int main(void)
 {
     while (1) {
@@ -46,14 +67,13 @@ int main(void)
                     perror("mysh");
                 }
                 break;
-            case MYSH_SETV:
-                printf("doing env stuff\n");
+            case MYSH_EVAR:
+                handle_env_var_operations(arg_c, args);
                 break;
             case MYSH_EXEC:
                 run_process(args);
                 break;
             case MYSH_EXIT:
-                printf("exiting shell\n");
                 exit(0);
                 break;
             default:

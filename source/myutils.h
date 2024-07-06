@@ -6,7 +6,7 @@ enum Mysh_command {
   MYSH_EXEC,
   MYSH_EXIT,
   MYSH_CHDR,
-  MYSH_SETV,
+  MYSH_EVAR,
 };
 
 enum Mysh_command get_command(char *str);

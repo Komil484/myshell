@@ -16,7 +16,7 @@ void exit_if_memory_error(void *new_memory)
 enum Mysh_command get_command(char *str)
 {
     if (strcmp(str, "cd") == 0)   return MYSH_CHDR;
-    if (strcmp(str, "set") == 0)  return MYSH_SETV;
+    if (strcmp(str, "var") == 0)  return MYSH_EVAR;
     if (strcmp(str, "exit") == 0) return MYSH_EXIT;
     return MYSH_EXEC;
 }
