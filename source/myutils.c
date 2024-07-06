@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+// exits the program if memory allocation failure occurs
 void exit_if_memory_error(void *new_memory)
 {
     if (new_memory) return;
@@ -12,6 +13,8 @@ void exit_if_memory_error(void *new_memory)
     exit(1);
 }
 
+// reads from c-string and finds the matching quote
+// returns pointer to the closing quote
 const char *get_closing_quote_ptr(const char *read)
 {
     const char quotes = *read;
@@ -33,6 +36,8 @@ const char *get_closing_quote_ptr(const char *read)
     return read_ptr;
 }
 
+// gets the identifier name starting from str
+// returns a malloced copy of identifier name
 char *get_var_name(const char *str)
 {
     char c = *str;
@@ -168,7 +173,7 @@ void replace_if_escape(char **read, char **write)
     *write = write_ptr;
 }
 
-
+// reallocates null terminated array of c-strings if full
 void realloc_if_full(char **args, unsigned long arr_len, unsigned long *cap)
 {
     unsigned long local_cap = *cap;
@@ -182,6 +187,14 @@ void realloc_if_full(char **args, unsigned long arr_len, unsigned long *cap)
     }
 
     *cap = local_cap;
+}
+
+// counts the amount of arguments in a null terminated array of c-strings
+unsigned long get_arg_count(char **parsed)
+{
+    unsigned long count = 0;
+    for (; parsed[count]; ++count);
+    return count;
 }
 
 // returns null terminated array of c-strings
