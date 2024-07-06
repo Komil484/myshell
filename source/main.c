@@ -58,6 +58,11 @@ void handle_env_var_operations(unsigned long arg_c, char **args) {
 int main(void)
 {
     while (1) {
+        char *user = getenv("USER");
+        char *name = getenv("NAME");
+        char *pwd  = getenv("PWD");
+        printf("%s@%s:%s$ ", user, name, pwd);
+
         char *input = get_input();
         char **args = parse(input);
         free(input);
