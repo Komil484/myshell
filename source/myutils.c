@@ -13,6 +13,14 @@ void exit_if_memory_error(void *new_memory)
     exit(1);
 }
 
+enum Mysh_command get_command(char *str)
+{
+    if (strcmp(str, "cd") == 0)   return MYSH_CHDR;
+    if (strcmp(str, "set") == 0)  return MYSH_SETV;
+    if (strcmp(str, "exit") == 0) return MYSH_EXIT;
+    return MYSH_EXEC;
+}
+
 // reads from c-string and finds the matching quote
 // returns pointer to the closing quote
 const char *get_closing_quote_ptr(const char *read)
@@ -83,6 +91,7 @@ char *substitute_env_vars(const char *in_str)
     char c;
     const char *read = in_str;
     char *write = str;
+    bool prev_char_space = true;
 
     while ((c = *read)) {
         switch (c) {
