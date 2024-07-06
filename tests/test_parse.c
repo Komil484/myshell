@@ -103,6 +103,45 @@ static MunitResult test_backticks_escape(const MunitParameter params[], void* us
     return MUNIT_OK;
 }
 
+static MunitResult test_no_args(const MunitParameter params[], void* user_data_or_fixture)
+{
+    char input[] = "";
+
+    char *expected[] = {NULL};
+
+    char **parsed = parse(input);
+    assert_arr_string(parsed, expected);
+    free_parsed(parsed);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_spaces_before(const MunitParameter params[], void* user_data_or_fixture)
+{
+    char input[] = " \tcmd";
+
+    char *expected[] = {"cmd", NULL};
+
+    char **parsed = parse(input);
+    assert_arr_string(parsed, expected);
+    free_parsed(parsed);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_spaces_after(const MunitParameter params[], void* user_data_or_fixture)
+{
+    char input[] = "cmd \t";
+
+    char *expected[] = {"cmd", NULL};
+
+    char **parsed = parse(input);
+    assert_arr_string(parsed, expected);
+    free_parsed(parsed);
+
+    return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
     {
         "/simple", /* name */
@@ -155,6 +194,30 @@ static MunitTest tests[] = {
     {
         "/backticks_escape", /* name */
         test_backticks_escape, /* test */
+        NULL, /* setup */
+        NULL, /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL /* parameters */
+    },
+    {
+        "/no_args", /* name */
+        test_no_args, /* test */
+        NULL, /* setup */
+        NULL, /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL /* parameters */
+    },
+    {
+        "/spaces_before", /* name */
+        test_spaces_before, /* test */
+        NULL, /* setup */
+        NULL, /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL /* parameters */
+    },
+    {
+        "/backticks_escape", /* name */
+        test_spaces_after, /* test */
         NULL, /* setup */
         NULL, /* tear_down */
         MUNIT_TEST_OPTION_NONE, /* options */

@@ -14,6 +14,11 @@ void print_debug_info(unsigned long arg_c, char **args)
     printf("\n\n");
 }
 
+void print_help()
+{
+    printf("TODO: Print proper help message\n");
+}
+
 void run_process(char **args)
 {
     pid_t pid = fork();
@@ -60,18 +65,20 @@ int main(void)
         unsigned long arg_c = get_arg_count(args);
         
         switch (get_command(args[0])) {
+            case MYSH_NULL:
+                break;
             case MYSH_CHDR:
                 char *path = (arg_c > 1) ? args[1] : getenv("HOME");
-                if (path == NULL) perror("mysh");
-                if (chdir(path)) {
-                    perror("mysh");
-                }
+                if (path == NULL || chdir(path)) perror("mysh");
                 break;
             case MYSH_EVAR:
                 handle_env_var_operations(arg_c, args);
                 break;
             case MYSH_EXEC:
                 run_process(args);
+                break;
+            case MYSH_HELP:
+                print_help();
                 break;
             case MYSH_EXIT:
                 exit(0);

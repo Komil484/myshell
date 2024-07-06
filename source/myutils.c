@@ -15,8 +15,10 @@ void exit_if_memory_error(void *new_memory)
 
 enum Mysh_command get_command(char *str)
 {
+    if (str == NULL)              return MYSH_NULL;
     if (strcmp(str, "cd") == 0)   return MYSH_CHDR;
     if (strcmp(str, "var") == 0)  return MYSH_EVAR;
+    if (strcmp(str, "help") == 0) return MYSH_HELP;
     if (strcmp(str, "exit") == 0) return MYSH_EXIT;
     return MYSH_EXEC;
 }
@@ -91,7 +93,6 @@ char *substitute_env_vars(const char *in_str)
     char c;
     const char *read = in_str;
     char *write = str;
-    bool prev_char_space = true;
 
     while ((c = *read)) {
         switch (c) {
@@ -215,19 +216,23 @@ char **parse(const char *in_str)
 
     char *str = substitute_env_vars(in_str);
 
-    unsigned long arr_len = 2, cap = INITIAL_CAP;
+    unsigned long arr_len = 1, cap = INITIAL_CAP;
     char **args = calloc(INITIAL_CAP, sizeof(char*));
     exit_if_memory_error(args);
-    args[0] = str;
 
     char c;
     char *read = str;
     char *write = str;
-    bool prev_char_space = true;
+    bool prev_char_space = false;
+    bool has_args = false;
 
+    while (*read && isspace(*read)) ++read;
+    
+    char *current_arg = write;
+    
+    has_args = *read;
     while ((c = *read)) {
-        if (c != ' ') prev_char_space = false;
-
+        if (isspace(c)) c = ' ';
         switch (c) {
             case ' ':
                 ++read;
@@ -235,7 +240,8 @@ char **parse(const char *in_str)
 
                 realloc_if_full(args, arr_len, &cap);
                 *write++ = '\0';
-                args[arr_len - 1] = write; // using write (not read), as it is the resulting string
+                args[arr_len - 1] = current_arg;
+                current_arg = write; // using write (not read), as it is the resulting string
                 ++arr_len;
                 break;
 
@@ -285,9 +291,16 @@ char **parse(const char *in_str)
                 ++read;
                 break;
         }
+        prev_char_space = (c == ' ');
     }
 
-    *write = '\0';
+    if (has_args && !prev_char_space) {
+        realloc_if_full(args, arr_len, &cap);
+        *write++ = '\0';
+        args[arr_len - 1] = current_arg;
+        current_arg = write;
+        ++arr_len;
+    }
 
     return args;
 }
