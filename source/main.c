@@ -4,6 +4,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <limits.h>
+
+char empty_str[] = "";
+
+char *safe_getenv(char *path)
+{
+    char *value = getenv(path);
+    if (value) return value;
+    return (value = empty_str);
+}
 
 void print_debug_info(unsigned long arg_c, char **args)
 {
@@ -58,10 +68,21 @@ void handle_env_var_operations(unsigned long arg_c, char **args) {
 int main(void)
 {
     while (1) {
-        char *user = getenv("USER");
-        char *name = getenv("NAME");
-        char *pwd  = getenv("PWD");
-        printf("%s@%s:%s$ ", user, name, pwd);
+        char *user = safe_getenv("USER");
+        char *name = safe_getenv("NAME");
+        char cwd_buf[PATH_MAX];
+        getcwd(cwd_buf, sizeof(cwd_buf));
+        exit_if_memory_error(cwd_buf);
+    
+        char *home = safe_getenv("HOME");
+        unsigned long home_len = strlen(home);
+        char *cwd = cwd_buf;
+        if (strncmp(home, cwd, home_len) == 0) {
+            cwd += home_len - 1;
+            *cwd = '~';
+        }
+
+        printf("%s@%s:%s$ ", user, name, cwd);
 
         char *input = get_input();
         char **args = parse(input);

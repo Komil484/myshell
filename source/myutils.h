@@ -11,6 +11,7 @@ enum Mysh_command {
   MYSH_EXIT,
 };
 
+void exit_if_memory_error(void *new_memory);
 enum Mysh_command get_command(char *str);
 char *substitute_env_vars(const char *in_str);
 unsigned long get_arg_count(char **parsed);
